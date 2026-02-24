@@ -8,7 +8,7 @@ export function getBaseUrl(): string {
 }
 
 export function getHealthCheckUrl(): string {
-  return HEALTH_CHECK_URL || "/health";
+  return HEALTH_CHECK_URL || "/health_check";
 }
 
 export const LangflowButtonRedirectTarget = () => {

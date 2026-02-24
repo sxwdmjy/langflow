@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GRADIENT_CLASS } from "@/constants/constants";
-import { customGetHostProtocol } from "@/customization/utils/custom-get-host-protocol";
+import { BASE_URL_API } from "@/customization/config-constants";
 import { getCurlWebhookCode } from "@/modals/apiModal/utils/get-curl-code";
 import ComponentTextModal from "@/modals/textAreaModal";
 import { useUtilityStore } from "@/stores/utilityStore";
@@ -23,9 +23,10 @@ const inputClasses = {
 
 const WEBHOOK_VALUE = "CURL_WEBHOOK";
 const MCP_SSE_VALUE = "MCP_SSE";
-
-const { protocol, host } = customGetHostProtocol();
-const URL_MCP_SSE = `${protocol}//${host}/api/v1/mcp/sse`;
+const URL_MCP_SSE = new URL(
+  `${BASE_URL_API}mcp/sse`,
+  window.location.origin,
+).toString();
 
 const externalLinkIconClasses = {
   gradient: ({
