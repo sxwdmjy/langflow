@@ -24,26 +24,49 @@ http {
 
         listen ${FRONTEND_PORT};
 
-        location / {
+        location = / {
+            return 302 /langflow/;
+        }
+
+        location /langflow/ {
+            rewrite ^/langflow/(.*)$ /$1 break;
             root /usr/share/nginx/html;
             index index.html index.htm;
             try_files $uri $uri/ /index.html =404;
             expires 1d;
             add_header Cache-Control "public";
         }
-        location = /index.html {
+
+        location = /langflow/index.html {
+            rewrite ^/langflow/(.*)$ /$1 break;
             root /usr/share/nginx/html;
             add_header Cache-Control "no-cache, no-store, must-revalidate";
             etag on;
         }
 
-        location /api {
+        location /langflow/api/ {
+            rewrite ^/langflow/api/(.*)$ /api/$1 break;
+            proxy_pass ${BACKEND_URL};
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+
+        location = /langflow/health_check {
+            rewrite ^/langflow/health_check$ /health_check break;
             proxy_pass ${BACKEND_URL};
         }
-        location /health_check {
+
+        location = /langflow/health {
+            rewrite ^/langflow/health$ /health break;
             proxy_pass ${BACKEND_URL};
         }
-        location /health {
+
+        location /langflow/docs {
+            rewrite ^/langflow/docs(.*)$ /docs$1 break;
             proxy_pass ${BACKEND_URL};
         }
 
