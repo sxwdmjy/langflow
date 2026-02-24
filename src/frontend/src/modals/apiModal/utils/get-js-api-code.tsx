@@ -29,6 +29,7 @@ export function getNewJsApiCode({
   const hostname = parsedUrl.hostname;
   const port =
     parsedUrl.port || (parsedUrl.protocol === "https:" ? "443" : "80");
+  const apiPathPrefix = parsedUrl.pathname.replace(/\/$/, "");
 
   // Check if there are file uploads
   const tweaks = processedPayload.tweaks || {};
@@ -107,7 +108,7 @@ const authHeaders = { 'x-api-key': apiKey };`
         const chatUploadOptions${index + 1} = {
             hostname: '${hostname}',
             port: ${port},
-            path: \`/api/v1/files/upload/\${FLOW_ID}\`,
+            path: \`${apiPathPrefix}/api/v1/files/upload/\${FLOW_ID}\`,
             method: 'POST',
             headers: {
 
@@ -154,7 +155,7 @@ const authHeaders = { 'x-api-key': apiKey };`
         const fileUploadOptions${index + 1} = {
             hostname: '${hostname}',
             port: ${port},
-            path: '/api/v2/files',
+            path: '${apiPathPrefix}/api/v2/files',
             method: 'POST',
             headers: {
                 'Content-Type': \`multipart/form-data; boundary=\${fileBoundary${
@@ -286,7 +287,7 @@ ${allTweaks}
         const executeOptions = {
             hostname: '${hostname}',
             port: ${port},
-            path: \`/api/v1/run/${endpointName || flowId}\`,
+            path: \`${apiPathPrefix}/api/v1/run/${endpointName || flowId}\`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

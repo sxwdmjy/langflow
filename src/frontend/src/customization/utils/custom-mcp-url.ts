@@ -1,5 +1,5 @@
 import type { MCPTransport } from "@/controllers/API/queries/mcp/use-patch-install-mcp";
-import { api } from "@/controllers/API/api";
+import { BASE_URL_API } from "../config-constants";
 
 type ComposerConnectionOptions = {
   useComposer?: boolean;
@@ -26,8 +26,10 @@ export const customGetMCPUrl = (
     }
   }
 
-  const apiHost = api.defaults.baseURL || window.location.origin;
-  const baseUrl = `${apiHost}/api/v1/mcp/project/${projectId}`;
+  const baseUrl = new URL(
+    `${BASE_URL_API}mcp/project/${projectId}`,
+    window.location.origin,
+  ).toString();
   return transport === "streamablehttp"
     ? `${baseUrl}/streamable`
     : `${baseUrl}/sse`;
