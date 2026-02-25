@@ -3,6 +3,8 @@ import IconComponent from "@/components/common/genericIconComponent";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useUpdateUser } from "@/controllers/API/queries/auth";
 import CustomGetStartedProgress from "@/customization/components/custom-get-started-progress";
+import { ENABLE_SOCIAL_LINKS } from "@/customization/feature-flags";
+import { useI18n } from "@/hooks/use-i18n";
 import useAuthStore from "@/stores/authStore";
 import { useUtilityStore } from "@/stores/utilityStore";
 import { AddFolderButton } from "./add-folder-button";
@@ -19,6 +21,7 @@ export const HeaderButtons = ({
   isPending: boolean;
   addNewFolder: () => void;
 }) => {
+  const { t } = useI18n();
   const userData = useAuthStore((state) => state.userData);
   const hideGettingStartedProgress = useUtilityStore(
     (state) => state.hideGettingStartedProgress,
@@ -27,20 +30,11 @@ export const HeaderButtons = ({
   const [isDismissedDialog, setIsDismissedDialog] = useState(
     userData?.optins?.dialog_dismissed,
   );
-  const [isGithubStarred, setIsGithubStarred] = useState(
-    userData?.optins?.github_starred,
-  );
-  const [isDiscordJoined, setIsDiscordJoined] = useState(
-    userData?.optins?.discord_clicked,
-  );
-
   const { mutate: updateUser } = useUpdateUser();
 
   useEffect(() => {
     if (userData) {
       setIsDismissedDialog(userData.optins?.dialog_dismissed);
-      setIsGithubStarred(userData.optins?.github_starred);
-      setIsDiscordJoined(userData.optins?.discord_clicked);
     }
   }, [userData]);
 
@@ -59,12 +53,12 @@ export const HeaderButtons = ({
 
   return (
     <>
-      {!hideGettingStartedProgress && !isDismissedDialog && userData && (
+      {ENABLE_SOCIAL_LINKS &&
+        !hideGettingStartedProgress &&
+        !isDismissedDialog &&
+        userData && (
         <>
           <CustomGetStartedProgress
-            userData={userData!}
-            isGithubStarred={isGithubStarred ?? false}
-            isDiscordJoined={isDiscordJoined ?? false}
             handleDismissDialog={handleDismissDialog}
           />
 
@@ -72,14 +66,14 @@ export const HeaderButtons = ({
             <hr className="border-t-1 w-full" />
           </div>
         </>
-      )}
+        )}
 
       <div className="flex shrink-0 items-center justify-between gap-2 pt-2">
         <SidebarTrigger className="lg:hidden">
           <IconComponent name="PanelLeftClose" className="h-4 w-4" />
         </SidebarTrigger>
 
-        <div className="flex-1 text-sm font-medium">Projects</div>
+        <div className="flex-1 text-sm font-medium">{t("main.projects")}</div>
         <div className="flex items-center gap-1">
           <UploadFolderButton
             onClick={handleUploadFlowsToFolder}

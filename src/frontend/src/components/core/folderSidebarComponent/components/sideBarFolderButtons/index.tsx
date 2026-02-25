@@ -29,6 +29,7 @@ import {
   ENABLE_MCP_NOTICE,
 } from "@/customization/feature-flags";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
+import { useI18n } from "@/hooks/use-i18n";
 import { track } from "@/customization/utils/analytics";
 import { customGetDownloadFolderBlob } from "@/customization/utils/custom-get-download-folders";
 import { createFileUpload } from "@/helpers/create-file-upload";
@@ -59,6 +60,7 @@ const SideBarFoldersButtonsComponent = ({
   handleDeleteFolder,
   handleFilesClick,
 }: SideBarFoldersButtonsComponentProps) => {
+  const { t } = useI18n();
   const location = useLocation();
   const pathname = location.pathname;
   const folders = useFolderStore((state) => state.folders);
@@ -137,7 +139,7 @@ const SideBarFoldersButtonsComponent = ({
         if (objects.every((flow) => flow.data?.nodes)) {
           uploadFlow({ files }).then(() => {
             setSuccessData({
-              title: "Uploaded successfully",
+              title: t("main.uploadedSuccessfully"),
             });
           });
         } else {
@@ -149,13 +151,13 @@ const SideBarFoldersButtonsComponent = ({
               {
                 onSuccess: () => {
                   setSuccessData({
-                    title: "Project uploaded successfully.",
+                    title: t("main.projectUploadedSuccessfully"),
                   });
                 },
                 onError: (err) => {
                   console.error(err);
                   setErrorData({
-                    title: `Error on uploading your project, try dragging it into an existing project.`,
+                    title: t("main.errorUploadingProject"),
                     list: [err["response"]["data"]["message"]],
                   });
                 },
@@ -178,7 +180,7 @@ const SideBarFoldersButtonsComponent = ({
         },
         onError: (e) => {
           setErrorData({
-            title: `An error occurred while downloading your project.`,
+            title: t("main.errorDownloadingProject"),
           });
         },
       },
@@ -189,7 +191,7 @@ const SideBarFoldersButtonsComponent = ({
     mutateAddFolder(
       {
         data: {
-          name: "New Project",
+          name: t("main.newProject"),
           parent_id: null,
           description: "",
         },
@@ -378,7 +380,7 @@ const SideBarFoldersButtonsComponent = ({
               {!loading ? (
                 folders.length === 0 ? (
                   <div className="px-2 py-5 text-center text-sm text-muted-foreground">
-                    Start creating a project or flow
+                    {t("main.startCreatingProjectOrFlow")}
                   </div>
                 ) : (
                   folders.map((item, index) => {
@@ -486,7 +488,7 @@ const SideBarFoldersButtonsComponent = ({
                 className="text-sm"
               >
                 <ForwardedIconComponent name="Library" className="h-4 w-4" />
-                Knowledge
+                {t("main.knowledge")}
               </SidebarMenuButton>
             )}
             <SidebarMenuButton
@@ -495,7 +497,7 @@ const SideBarFoldersButtonsComponent = ({
               className="text-sm"
             >
               <ForwardedIconComponent name="File" className="h-4 w-4" />
-              My Files
+              {t("main.myFiles")}
             </SidebarMenuButton>
           </div>
         </SidebarFooter>
