@@ -89,10 +89,12 @@ RUN useradd --uid 1000 --gid 0 --no-create-home --home-dir /app/data user
 COPY --from=builder --chown=1000:0 /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create home directory and ensure proper ownership
-# The user needs write access to /app/data (home) and /app (workdir)
-# Note: .venv is already owned by 1000:0 via COPY --chown above, so no recursive chown needed
-RUN mkdir -p /app/data && chown -R 1000:0 /app/data && chown 1000:0 /app
+# Create runtime directories and ensure proper ownership
+# /app/langflow is the default LANGFLOW_CONFIG_DIR in compose examples.
+RUN mkdir -p /app/data /app/langflow \
+    && chown -R 1000:0 /app/data /app/langflow \
+    && chmod 2775 /app/data /app/langflow \
+    && chown 1000:0 /app
 
 LABEL org.opencontainers.image.title=langflow-backend
 LABEL org.opencontainers.image.authors=['Langflow']
