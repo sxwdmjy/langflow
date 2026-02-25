@@ -57,15 +57,28 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (required for npx-based MCP stdio servers)
+ARG NODEJS_DIST_BASE_URL=https://nodejs.org/dist
+ARG NODEJS_DIST_FALLBACK_URL=https://npmmirror.com/mirrors/node
 RUN ARCH=$(dpkg --print-architecture) \
     && if [ "$ARCH" = "amd64" ]; then NODE_ARCH="x64"; \
        elif [ "$ARCH" = "arm64" ]; then NODE_ARCH="arm64"; \
        else NODE_ARCH="$ARCH"; fi \
-    && NODE_VERSION=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/ \
+    && NODE_VERSION=$(curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 "${NODEJS_DIST_BASE_URL}/latest-v22.x/" \
                     | grep -oP "node-v\K[0-9]+\.[0-9]+\.[0-9]+(?=-linux-${NODE_ARCH}\.tar\.xz)" \
                     | head -1) \
-    && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" \
-    | tar -xJ -C /usr/local --strip-components=1 \
+    && if [ -z "$NODE_VERSION" ]; then \
+         NODE_VERSION=$(curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 "${NODEJS_DIST_FALLBACK_URL}/latest-v22.x/" \
+                       | grep -oP "node-v\K[0-9]+\.[0-9]+\.[0-9]+(?=-linux-${NODE_ARCH}\.tar\.xz)" \
+                       | head -1); \
+       fi \
+    && [ -n "$NODE_VERSION" ] \
+    && (curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 \
+         "${NODEJS_DIST_BASE_URL}/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -o /tmp/node.tar.xz \
+        || curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 \
+         "${NODEJS_DIST_FALLBACK_URL}/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -o /tmp/node.tar.xz) \
+    && xz -t /tmp/node.tar.xz \
+    && tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 \
+    && rm -f /tmp/node.tar.xz \
     && npm install -g npm@latest \
     && npm cache clean --force
 

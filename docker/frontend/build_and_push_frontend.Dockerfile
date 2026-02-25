@@ -9,7 +9,11 @@
 FROM --platform=$BUILDPLATFORM node:lts-bookworm-slim AS builder-base
 COPY src/frontend /frontend
 
-RUN cd /frontend && npm install && npm run build
+ARG NPM_REGISTRY=https://registry.npmjs.org/
+RUN cd /frontend \
+    && npm config set registry "${NPM_REGISTRY}" \
+    && npm install --fetch-retries=5 --fetch-retry-factor=2 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=120000 \
+    && npm run build
 
 ################################
 # RUNTIME
