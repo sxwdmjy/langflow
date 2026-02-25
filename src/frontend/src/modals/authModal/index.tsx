@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { CustomLink } from "@/customization/components/custom-link";
+import { useI18n } from "@/hooks/use-i18n";
 import type { AuthSettingsType } from "@/types/mcp";
 import { AUTH_METHODS_ARRAY } from "@/utils/mcpUtils";
 import { toSpaceCase } from "@/utils/stringManipulation";
@@ -27,6 +28,7 @@ const AuthModal = ({
   onSave,
   installedClients,
 }: AuthModalProps) => {
+  const { t } = useI18n();
   const [authType, setAuthType] = useState<string>(
     authSettings?.auth_type || "none",
   );
@@ -155,13 +157,13 @@ const AuthModal = ({
             name="Fingerprint"
             className="h-4 w-4 shrink-0"
           />
-          Configure MCP Server Authentication
+          {t("mcp.auth.configureTitle")}
         </div>
         <div className="flex h-full p-0 border-t rounded-none">
           {/* Left column - Radio buttons */}
           <div className="flex flex-col p-4 gap-2 flex-1 items-start min-h-[250px] transition-all">
             <span className="text-mmd font-medium text-muted-foreground">
-              Auth type
+              {t("mcp.auth.type")}
             </span>
             <RadioGroup value={authType} onValueChange={handleAuthTypeChange}>
               {AUTH_METHODS_ARRAY.map((option) => (
@@ -171,15 +173,20 @@ const AuthModal = ({
                     htmlFor={option.id}
                     className="!text-mmd font-normal cursor-pointer flex items-center gap-3"
                   >
-                    {option.label}
+                    {option.id === "none"
+                      ? t("mcp.auth.optionNone")
+                      : option.id === "apikey"
+                        ? t("mcp.auth.optionApiKey")
+                        : option.id === "oauth"
+                          ? t("mcp.auth.optionOauth")
+                          : option.label}
                     {option.id === "none" && authType === "none" && (
                       <span className="text-accent-amber-foreground flex gap-1.5 text-xs items-center">
                         <ForwardedIconComponent
                           name="AlertTriangle"
                           className="h-3.5 w-3.5 shrink-0"
                         />
-                        Public endpoint - no auth. Use only in dev or trusted
-                        envs.
+                        {t("mcp.auth.publicEndpointWarning")}
                       </span>
                     )}
                   </Label>
@@ -196,23 +203,24 @@ const AuthModal = ({
               {authType === "apikey" && (
                 <span className="flex flex-col items-start gap-1 text-mmd text-muted-foreground">
                   <p>
-                    Create a key in{" "}
+                    {t("mcp.auth.apikeyHintPrefix")}{" "}
                     <CustomLink
                       className="text-accent-pink-foreground underline inline-block"
                       to="/settings/api-keys"
                     >
-                      Settings
+                      {t("settings.pageTitle")}
                     </CustomLink>{" "}
-                    and include it in the{" "}
-                    <span className="font-semibold">install JSON</span>. Or,
-                    create a key automatically from the{" "}
-                    <span className="font-semibold">JSON tab</span>.
+                    {t("mcp.auth.apikeyHintMiddle")}{" "}
+                    <span className="font-semibold">{t("mcp.auth.installJson")}</span>.{" "}
+                    {t("mcp.auth.apikeyHintSuffix")}{" "}
+                    <span className="font-semibold">{t("mcp.auth.jsonTab")}</span>.
                   </p>
                   {autoInstall && (
                     <p>
-                      <span className="font-semibold">Auto Install</span>{" "}
-                      creates and injects a key into the selected client profile
-                      on this machine.
+                      <span className="font-semibold">
+                        {t("mcp.auth.autoInstall")}
+                      </span>{" "}
+                      {t("mcp.auth.autoInstallHint")}
                     </p>
                   )}
                 </span>
@@ -221,7 +229,7 @@ const AuthModal = ({
               {authType === "oauth" && (
                 <div className="flex flex-col gap-4 h-full">
                   <span className="text-mmd font-medium text-muted-foreground">
-                    OAuth settings
+                    {t("mcp.auth.oauthSettings")}
                   </span>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-2">
@@ -229,12 +237,12 @@ const AuthModal = ({
                         htmlFor="oauth-host"
                         className="!text-mmd font-medium"
                       >
-                        Host
+                        {t("mcp.auth.host")}
                       </Label>
                       <Input
                         id="oauth-host"
                         type="text"
-                        placeholder="localhost"
+                        placeholder={t("mcp.auth.hostPlaceholder")}
                         value={authFields.oauthHost || ""}
                         onChange={(e) =>
                           handleAuthFieldChange("oauthHost", e.target.value)
@@ -246,12 +254,12 @@ const AuthModal = ({
                         htmlFor="oauth-port"
                         className="!text-mmd font-medium"
                       >
-                        Port
+                        {t("mcp.auth.port")}
                       </Label>
                       <Input
                         id="oauth-port"
                         type="text"
-                        placeholder="1234"
+                        placeholder={t("mcp.auth.portPlaceholder")}
                         value={authFields.oauthPort || ""}
                         onChange={(e) =>
                           handleAuthFieldChange("oauthPort", e.target.value)
@@ -264,12 +272,12 @@ const AuthModal = ({
                       htmlFor="oauth-server-url"
                       className="!text-mmd font-medium"
                     >
-                      Server URL
+                      {t("mcp.auth.serverUrl")}
                     </Label>
                     <Input
                       id="oauth-server-url"
                       type="text"
-                      placeholder="http://localhost:1234"
+                      placeholder={t("mcp.auth.serverUrlPlaceholder")}
                       value={authFields.oauthServerUrl || ""}
                       onChange={(e) =>
                         handleAuthFieldChange("oauthServerUrl", e.target.value)
@@ -281,12 +289,12 @@ const AuthModal = ({
                       htmlFor="oauth-callback-url"
                       className="!text-mmd font-medium"
                     >
-                      Callback URL
+                      {t("mcp.auth.callbackUrl")}
                     </Label>
                     <Input
                       id="oauth-callback-url"
                       type="text"
-                      placeholder="http://localhost:9000/auth/idaas/callback"
+                      placeholder={t("mcp.auth.callbackUrlPlaceholder")}
                       value={authFields.oauthCallbackUrl || ""}
                       onChange={(e) =>
                         handleAuthFieldChange(
@@ -301,12 +309,12 @@ const AuthModal = ({
                       htmlFor="oauth-client-id"
                       className="!text-mmd font-medium"
                     >
-                      Client ID
+                      {t("mcp.auth.clientId")}
                     </Label>
                     <Input
                       id="oauth-client-id"
                       type="text"
-                      placeholder="Enter Client ID"
+                      placeholder={t("mcp.auth.clientIdPlaceholder")}
                       value={authFields.oauthClientId || ""}
                       onChange={(e) =>
                         handleAuthFieldChange("oauthClientId", e.target.value)
@@ -318,12 +326,12 @@ const AuthModal = ({
                       htmlFor="oauth-client-secret"
                       className="!text-mmd font-medium"
                     >
-                      Client Secret
+                      {t("mcp.auth.clientSecret")}
                     </Label>
                     <Input
                       id="oauth-client-secret"
                       type="password"
-                      placeholder="Enter Client Secret"
+                      placeholder={t("mcp.auth.clientSecretPlaceholder")}
                       value={authFields.oauthClientSecret || ""}
                       onChange={(e) =>
                         handleAuthFieldChange(
@@ -338,13 +346,13 @@ const AuthModal = ({
                       htmlFor="oauth-auth-url"
                       className="!text-mmd font-medium"
                     >
-                      Authorization URL
+                      {t("mcp.auth.authorizationUrl")}
                     </Label>
                     <Input
                       id="oauth-auth-url"
                       type="text"
                       value={authFields.oauthAuthUrl || ""}
-                      placeholder="http://localhost:1234/auth/idaas/authorize"
+                      placeholder={t("mcp.auth.authorizationUrlPlaceholder")}
                       onChange={(e) =>
                         handleAuthFieldChange("oauthAuthUrl", e.target.value)
                       }
@@ -355,13 +363,13 @@ const AuthModal = ({
                       htmlFor="oauth-token-url"
                       className="!text-mmd font-medium"
                     >
-                      Token URL
+                      {t("mcp.auth.tokenUrl")}
                     </Label>
                     <Input
                       id="oauth-token-url"
                       type="text"
                       value={authFields.oauthTokenUrl || ""}
-                      placeholder="http://localhost:1234/auth/idaas/token"
+                      placeholder={t("mcp.auth.tokenUrlPlaceholder")}
                       onChange={(e) =>
                         handleAuthFieldChange("oauthTokenUrl", e.target.value)
                       }
@@ -372,12 +380,12 @@ const AuthModal = ({
                       htmlFor="oauth-mcp-scope"
                       className="!text-mmd font-medium"
                     >
-                      MCP Scope
+                      {t("mcp.auth.mcpScope")}
                     </Label>
                     <Input
                       id="oauth-mcp-scope"
                       type="text"
-                      placeholder="user"
+                      placeholder={t("mcp.auth.mcpScopePlaceholder")}
                       value={authFields.oauthMcpScope || ""}
                       onChange={(e) =>
                         handleAuthFieldChange("oauthMcpScope", e.target.value)
@@ -389,12 +397,12 @@ const AuthModal = ({
                       htmlFor="oauth-provider-scope"
                       className="!text-mmd font-medium"
                     >
-                      Provider Scope
+                      {t("mcp.auth.providerScope")}
                     </Label>
                     <Input
                       id="oauth-provider-scope"
                       type="text"
-                      placeholder="openid"
+                      placeholder={t("mcp.auth.providerScopePlaceholder")}
                       value={authFields.oauthProviderScope || ""}
                       onChange={(e) =>
                         handleAuthFieldChange(
@@ -412,7 +420,7 @@ const AuthModal = ({
       </BaseModal.Content>
       <BaseModal.Footer
         submit={{
-          label: "Save",
+          label: t("common.save"),
           onClick: handleSave,
         }}
         className="p-4 border-t"
@@ -424,10 +432,12 @@ const AuthModal = ({
           />
           <span className="text-mmd text-muted-foreground">
             {installedClients && installedClients.length > 0
-              ? `Changing auth type requires reinstalling this server in ${installedClients
-                  .map((client) => toSpaceCase(client))
-                  .join(", ")} and any other clients where it's used.`
-              : "Changing auth type requires reinstalling this server in all clients where it's used."}
+              ? t("mcp.auth.reinstallSpecificClients", {
+                  clients: installedClients
+                    .map((client) => toSpaceCase(client))
+                    .join(", "),
+                })
+              : t("mcp.auth.reinstallAllClients")}
           </span>
         </div>
       </BaseModal.Footer>
