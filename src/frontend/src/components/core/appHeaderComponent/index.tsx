@@ -10,15 +10,20 @@ import { Separator } from "@/components/ui/separator";
 import CustomAccountMenu from "@/customization/components/custom-AccountMenu";
 import CustomLangflowCounts from "@/customization/components/custom-langflow-counts";
 import { CustomOrgSelector } from "@/customization/components/custom-org-selector";
-import { LANGFLOW_AGENTIC_EXPERIENCE } from "@/customization/feature-flags";
+import {
+  ENABLE_SOCIAL_LINKS,
+  LANGFLOW_AGENTIC_EXPERIENCE,
+} from "@/customization/feature-flags";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
 import useTheme from "@/customization/hooks/use-custom-theme";
+import { useI18n } from "@/hooks/use-i18n";
 import useAlertStore from "@/stores/alertStore";
 import FlowMenu from "./components/FlowMenu";
 
 export default function AppHeader(): JSX.Element {
   const notificationCenter = useAlertStore((state) => state.notificationCenter);
   const navigate = useCustomNavigate();
+  const { t } = useI18n();
   const [activeState, setActiveState] = useState<"notifications" | null>(null);
   const notificationRef = useRef<HTMLButtonElement | null>(null);
   const notificationContentRef = useRef<HTMLDivElement | null>(null);
@@ -82,15 +87,17 @@ export default function AppHeader(): JSX.Element {
       >
         {false && <ModelProviderCount />}
         {LANGFLOW_AGENTIC_EXPERIENCE && <AssistantButton type="header" />}
-        <div className="hidden pr-2 whitespace-nowrap lg:inline-flex lg:items-center">
-          <CustomLangflowCounts />
-        </div>
+        {ENABLE_SOCIAL_LINKS && (
+          <div className="hidden pr-2 whitespace-nowrap lg:inline-flex lg:items-center">
+            <CustomLangflowCounts />
+          </div>
+        )}
         <AlertDropdown
           notificationRef={notificationContentRef}
           onClose={() => setActiveState(null)}
         >
           <ShadTooltip
-            content="Notifications and errors"
+            content={t("app.notificationsAndErrors")}
             side="bottom"
             styleClasses="z-10"
           >
@@ -117,7 +124,7 @@ export default function AppHeader(): JSX.Element {
                     strokeWidth={2}
                   />
                   <span className="hidden whitespace-nowrap">
-                    Notifications
+                    {t("app.notifications")}
                   </span>
                 </div>
               </Button>

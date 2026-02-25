@@ -6,6 +6,7 @@ import { useAddUser } from "@/controllers/API/queries/auth";
 import { CustomLink } from "@/customization/components/custom-link";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
 import { track } from "@/customization/utils/analytics";
+import { useI18n } from "@/hooks/use-i18n";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { SIGNUP_ERROR_ALERT } from "../../constants/alerts_constants";
@@ -23,6 +24,7 @@ import type {
 export default function SignUp(): JSX.Element {
   const [inputState, setInputState] =
     useState<signUpInputStateType>(CONTROL_INPUT_STATE);
+  const { t } = useI18n();
 
   const [isDisabled, setDisableBtn] = useState<boolean>(true);
 
@@ -95,12 +97,13 @@ export default function SignUp(): JSX.Element {
             className="mb-4 h-10 w-10 scale-[1.5]"
           />
           <span className="mb-6 text-2xl font-semibold text-primary">
-            Sign up for Langflow
+            {t("signup.signUpForLangflow")}
           </span>
           <div className="mb-3 w-full">
             <Form.Field name="username">
               <Form.Label className="data-[invalid]:label-invalid">
-                Username <span className="font-medium text-destructive">*</span>
+                {t("signup.username")}{" "}
+                <span className="font-medium text-destructive">*</span>
               </Form.Label>
 
               <Form.Control asChild>
@@ -112,19 +115,20 @@ export default function SignUp(): JSX.Element {
                   value={username}
                   className="w-full"
                   required
-                  placeholder="Username"
+                  placeholder={t("signup.usernamePlaceholder")}
                 />
               </Form.Control>
 
               <Form.Message match="valueMissing" className="field-invalid">
-                Please enter your username
+                {t("signup.enterUsername")}
               </Form.Message>
             </Form.Field>
           </div>
           <div className="mb-3 w-full">
             <Form.Field name="password" serverInvalid={password != cnfPassword}>
               <Form.Label className="data-[invalid]:label-invalid">
-                Password <span className="font-medium text-destructive">*</span>
+                {t("signup.password")}{" "}
+                <span className="font-medium text-destructive">*</span>
               </Form.Label>
               <InputComponent
                 onChange={(value) => {
@@ -134,17 +138,17 @@ export default function SignUp(): JSX.Element {
                 isForm
                 password={true}
                 required
-                placeholder="Password"
+                placeholder={t("signup.passwordPlaceholder")}
                 className="w-full"
               />
 
               <Form.Message className="field-invalid" match="valueMissing">
-                Please enter a password
+                {t("signup.enterPassword")}
               </Form.Message>
 
               {password != cnfPassword && (
                 <Form.Message className="field-invalid">
-                  Passwords do not match
+                  {t("signup.passwordsDoNotMatch")}
                 </Form.Message>
               )}
             </Form.Field>
@@ -155,7 +159,7 @@ export default function SignUp(): JSX.Element {
               serverInvalid={password != cnfPassword}
             >
               <Form.Label className="data-[invalid]:label-invalid">
-                Confirm your password{" "}
+                {t("signup.confirmPassword")}{" "}
                 <span className="font-medium text-destructive">*</span>
               </Form.Label>
 
@@ -167,12 +171,12 @@ export default function SignUp(): JSX.Element {
                 isForm
                 password={true}
                 required
-                placeholder="Confirm your password"
+                placeholder={t("signup.confirmPasswordPlaceholder")}
                 className="w-full"
               />
 
               <Form.Message className="field-invalid" match="valueMissing">
-                Please confirm your password
+                {t("signup.enterConfirmPassword")}
               </Form.Message>
             </Form.Field>
           </div>
@@ -186,14 +190,14 @@ export default function SignUp(): JSX.Element {
                   handleSignup();
                 }}
               >
-                Sign up
+                {t("signup.signUp")}
               </Button>
             </Form.Submit>
           </div>
           <div className="w-full">
             <CustomLink to="/login">
               <Button className="w-full" variant="outline">
-                Already have an account?&nbsp;<b>Sign in</b>
+                {t("signup.hasAccount")}&nbsp;<b>{t("signup.signIn")}</b>
               </Button>
             </CustomLink>
           </div>

@@ -11,6 +11,7 @@ import {
   ENABLE_MCP,
 } from "@/customization/feature-flags";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
+import { useI18n } from "@/hooks/use-i18n";
 import useFlowsManagerStore from "@/stores/flowsManagerStore";
 import { useFolderStore } from "@/stores/foldersStore";
 import { FlowType } from "@/types/flow";
@@ -22,6 +23,7 @@ import useFileDrop from "../../hooks/use-on-file-drop";
 import EmptyFolder from "../emptyFolder";
 
 const HomePage = ({ type }: { type: "flows" | "components" | "mcp" }) => {
+  const { t } = useI18n();
   const [view, setView] = useState<"grid" | "list">(() => {
     const savedView = localStorage.getItem("view");
     return savedView === "grid" || savedView === "list" ? savedView : "list";
@@ -248,7 +250,18 @@ const HomePage = ({ type }: { type: "flows" | "components" | "mcp" }) => {
   return (
     <CardsWrapComponent
       onFileDrop={flowType === "mcp" ? undefined : handleFileDrop}
-      dragMessage={`Drop your ${isEmptyFolder ? "flows or components" : flowType} here`}
+      dragMessage={
+        isEmptyFolder
+          ? t("main.dropFlowsOrComponentsHere")
+          : t("main.dropTypeHere", {
+              type:
+                flowType === "mcp"
+                  ? t("main.mcpServer")
+                  : flowType === "components"
+                    ? t("main.components")
+                    : t("main.flows"),
+            })
+      }
     >
       <div
         className="flex h-full w-full flex-col overflow-y-auto"
@@ -321,7 +334,14 @@ const HomePage = ({ type }: { type: "flows" | "components" | "mcp" }) => {
                     )
                   ) : (
                     <div className="pt-24 text-center text-sm text-secondary-foreground">
-                      {flowType} not supported
+                      {t("main.notSupported", {
+                        type:
+                          flowType === "mcp"
+                            ? t("main.mcpServer")
+                            : flowType === "components"
+                              ? t("main.components")
+                              : t("main.flows"),
+                      })}
                     </div>
                   )}
                 </div>

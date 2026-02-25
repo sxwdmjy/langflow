@@ -11,10 +11,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { SAVED_HOVER } from "@/constants/constants";
 import { useGetRefreshFlowsQuery } from "@/controllers/API/queries/flows/use-get-refresh-flows-query";
 import { useGetFoldersQuery } from "@/controllers/API/queries/folders/use-get-folders";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
+import { useI18n } from "@/hooks/use-i18n";
 import useSaveFlow from "@/hooks/flows/use-save-flow";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import useAlertStore from "@/stores/alertStore";
@@ -27,6 +27,7 @@ import { cn, getNumberFromString } from "@/utils/utils";
 export const MenuBar = memo((): JSX.Element => {
   const setSuccessData = useAlertStore((state) => state.setSuccessData);
   const saveLoading = useFlowsManagerStore((state) => state.saveLoading);
+  const { locale, t } = useI18n();
   const [openSettings, setOpenSettings] = useState(false);
   const navigate = useCustomNavigate();
   const isBuilding = useFlowStore((state) => state.isBuilding);
@@ -74,7 +75,7 @@ export const MenuBar = memo((): JSX.Element => {
   const handleSave = () => {
     if (!onFlowPage) return;
     saveFlow().then(() => {
-      setSuccessData({ title: "Saved successfully" });
+      setSuccessData({ title: t("flow.savedSuccessfully") });
     });
   };
 
@@ -139,7 +140,7 @@ export const MenuBar = memo((): JSX.Element => {
                 aria-hidden="true"
                 data-testid="flow_name"
               >
-                {currentFlowName || "Untitled Flow"}
+                {currentFlowName || t("flow.untitledFlow")}
               </span>
               <IconComponent
                 name="pencil"
@@ -157,15 +158,16 @@ export const MenuBar = memo((): JSX.Element => {
                 content={
                   changesNotSaved
                     ? saveLoading
-                      ? "Saving..."
-                      : "Save Changes"
-                    : SAVED_HOVER +
-                      (updatedAt
-                        ? new Date(updatedAt).toLocaleString("en-US", {
-                            hour: "numeric",
-                            minute: "numeric",
-                          })
-                        : "Never")
+                      ? t("flow.saving")
+                      : t("flow.saveChanges")
+                    : t("flow.lastSaved", {
+                        time: updatedAt
+                          ? new Date(updatedAt).toLocaleString(locale, {
+                              hour: "numeric",
+                              minute: "numeric",
+                            })
+                          : t("common.never"),
+                      })
                 }
                 side="bottom"
                 styleClasses="cursor-default z-10"

@@ -7,6 +7,7 @@ import { useDeleteFolders } from "@/controllers/API/queries/folders";
 import CustomEmptyPageCommunity from "@/customization/components/custom-empty-page";
 import CustomLoader from "@/customization/components/custom-loader";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
+import { useI18n } from "@/hooks/use-i18n";
 import useAlertStore from "@/stores/alertStore";
 import useFlowsManagerStore from "@/stores/flowsManagerStore";
 import { useFolderStore } from "@/stores/foldersStore";
@@ -14,6 +15,7 @@ import ModalsComponent from "../components/modalsComponent";
 import EmptyPageCommunity from "./empty-page";
 
 export default function CollectionPage(): JSX.Element {
+  const { t } = useI18n();
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteFolderModal, setOpenDeleteFolderModal] = useState(false);
   const setFolderToEdit = useFolderStore((state) => state.setFolderToEdit);
@@ -40,14 +42,14 @@ export default function CollectionPage(): JSX.Element {
       {
         onSuccess: () => {
           setSuccessData({
-            title: "Project deleted successfully.",
+            title: t("main.projectDeletedSuccessfully"),
           });
           navigate("/all");
         },
         onError: (err) => {
           console.error(err);
           setErrorData({
-            title: "Error deleting project.",
+            title: t("main.errorDeletingProject"),
           });
         },
       },

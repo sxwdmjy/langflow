@@ -14,6 +14,7 @@ import {
 } from "@/controllers/API/queries/knowledge-bases/use-get-knowledge-bases";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
 import { track } from "@/customization/utils/analytics";
+import { useI18n } from "@/hooks/use-i18n";
 import useAddFlow from "@/hooks/flows/use-add-flow";
 import DeleteConfirmationModal from "@/modals/deleteConfirmationModal";
 import useAlertStore from "@/stores/alertStore";
@@ -46,6 +47,7 @@ const KnowledgeBasesTab = ({
   isShiftPressed,
   onRowClick,
 }: KnowledgeBasesTabProps) => {
+  const { t } = useI18n();
   const tableRef = useRef<AgGridReact<any>>(null);
   const { setErrorData, setSuccessData } = useAlertStore((state) => ({
     setErrorData: state.setErrorData,
@@ -72,17 +74,19 @@ const KnowledgeBasesTab = ({
     {
       onSuccess: () => {
         setSuccessData({
-          title: `Knowledge Base "${knowledgeBaseToDelete?.name}" deleted successfully!`,
+          title: t("knowledgeBase.deletedSuccessfully", {
+            name: knowledgeBaseToDelete?.name || "",
+          }),
         });
         resetDeleteState();
       },
       onError: (error: any) => {
         setErrorData({
-          title: "Failed to delete knowledge base",
+          title: t("knowledgeBase.failedToDelete"),
           list: [
             error?.response?.data?.detail ||
               error?.message ||
-              "An unknown error occurred",
+              t("knowledgeBase.unknownError"),
           ],
         });
         resetDeleteState();
@@ -92,8 +96,8 @@ const KnowledgeBasesTab = ({
 
   if (error) {
     setErrorData({
-      title: "Failed to load knowledge bases",
-      list: [error?.message || "An unknown error occurred"],
+      title: t("knowledgeBase.failedToLoad"),
+      list: [error?.message || t("knowledgeBase.unknownError")],
     });
   }
 
@@ -153,7 +157,7 @@ const KnowledgeBasesTab = ({
     }
   };
 
-  const columnDefs = createKnowledgeBaseColumns();
+  const columnDefs = createKnowledgeBaseColumns(t);
 
   if (isLoading || !knowledgeBases || !Array.isArray(knowledgeBases)) {
     return (
@@ -177,7 +181,7 @@ const KnowledgeBasesTab = ({
             icon="Search"
             data-testid="search-kb-input"
             type="text"
-            placeholder="Search knowledge bases..."
+            placeholder={t("knowledgeBase.searchPlaceholder")}
             className="mr-2 w-full"
             value={quickFilterText || ""}
             onChange={(event) => setQuickFilterText(event.target.value)}
@@ -187,7 +191,7 @@ const KnowledgeBasesTab = ({
           className="flex items-center gap-2 font-semibold"
           onClick={handleCreateKnowledge}
         >
-          <ForwardedIconComponent name="Plus" /> Create knowledge
+          <ForwardedIconComponent name="Plus" /> {t("knowledgeBase.createKnowledge")}
         </Button>
       </div>
 
@@ -232,8 +236,10 @@ const KnowledgeBasesTab = ({
         open={isDeleteModalOpen}
         setOpen={setIsDeleteModalOpen}
         onConfirm={confirmDelete}
-        description={`knowledge base "${knowledgeBaseToDelete?.name || ""}"`}
-        note="This action cannot be undone"
+        description={t("knowledgeBase.item", {
+          name: knowledgeBaseToDelete?.name || "",
+        })}
+        note={t("knowledgeBase.deleteNote")}
       >
         <></>
       </DeleteConfirmationModal>

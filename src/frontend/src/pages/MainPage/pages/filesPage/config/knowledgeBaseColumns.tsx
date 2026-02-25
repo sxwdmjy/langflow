@@ -1,17 +1,23 @@
 import type { ColDef } from "ag-grid-community";
+import type { TranslationKey } from "@/i18n";
 import { formatFileSize } from "@/utils/stringManipulation";
 import {
   formatAverageChunkSize,
   formatNumber,
 } from "../utils/knowledgeBaseUtils";
 
-export const createKnowledgeBaseColumns = (): ColDef[] => {
+type Translator = (
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+) => string;
+
+export const createKnowledgeBaseColumns = (t: Translator): ColDef[] => {
   const baseCellClass =
     "text-muted-foreground cursor-pointer select-text group-[.no-select-cells]:cursor-default group-[.no-select-cells]:select-none";
 
   return [
     {
-      headerName: "Name",
+      headerName: t("files.name"),
       field: "name",
       flex: 2,
       sortable: false,
@@ -29,18 +35,20 @@ export const createKnowledgeBaseColumns = (): ColDef[] => {
       ),
     },
     {
-      headerName: "Embedding Model",
+      headerName: t("knowledgeBase.embeddingProvider"),
       field: "embedding_provider",
       flex: 2,
       sortable: false,
       filter: "agTextColumnFilter",
       editable: false,
       cellClass: baseCellClass,
-      tooltipValueGetter: (params) => params.data.embedding_model || "Unknown",
-      valueGetter: (params) => params.data.embedding_model || "Unknown",
+      tooltipValueGetter: (params) =>
+        params.data.embedding_model || t("knowledgeBase.unknown"),
+      valueGetter: (params) =>
+        params.data.embedding_model || t("knowledgeBase.unknown"),
     },
     {
-      headerName: "Size",
+      headerName: t("files.size"),
       field: "size",
       flex: 1,
       sortable: false,
@@ -49,7 +57,7 @@ export const createKnowledgeBaseColumns = (): ColDef[] => {
       cellClass: baseCellClass,
     },
     {
-      headerName: "Words",
+      headerName: t("knowledgeBase.words"),
       field: "words",
       flex: 1,
       sortable: false,
@@ -58,7 +66,7 @@ export const createKnowledgeBaseColumns = (): ColDef[] => {
       valueFormatter: (params) => formatNumber(params.value),
     },
     {
-      headerName: "Characters",
+      headerName: t("knowledgeBase.characters"),
       field: "characters",
       flex: 1,
       sortable: false,
@@ -67,7 +75,7 @@ export const createKnowledgeBaseColumns = (): ColDef[] => {
       valueFormatter: (params) => formatNumber(params.value),
     },
     {
-      headerName: "Chunks",
+      headerName: t("knowledgeBase.chunks"),
       field: "chunks",
       flex: 1,
       sortable: false,
@@ -76,7 +84,7 @@ export const createKnowledgeBaseColumns = (): ColDef[] => {
       valueFormatter: (params) => formatNumber(params.value),
     },
     {
-      headerName: "Avg Chunks",
+      headerName: t("knowledgeBase.avgChunks"),
       field: "avg_chunk_size",
       flex: 1,
       sortable: false,

@@ -8,6 +8,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDeleteDeleteFlows } from "@/controllers/API/queries/flows/use-delete-delete-flows";
 import { useGetDownloadFlows } from "@/controllers/API/queries/flows/use-get-download-flows";
 import { ENABLE_MCP } from "@/customization/feature-flags";
+import { useI18n } from "@/hooks/use-i18n";
 import DeleteConfirmationModal from "@/modals/deleteConfirmationModal";
 import useAlertStore from "@/stores/alertStore";
 import useFlowsManagerStore from "@/stores/flowsManagerStore";
@@ -38,6 +39,7 @@ const HeaderComponent = ({
 }: HeaderComponentProps) => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const isMCPEnabled = ENABLE_MCP;
+  const { t } = useI18n();
   const setSuccessData = useAlertStore((state) => state.setSuccessData);
   // Debounce the setSearch function from the parent
   const debouncedSetSearch = useCallback(
@@ -75,10 +77,15 @@ const HeaderComponent = ({
 
   // Determine which tabs to show based on feature flag
   const tabTypes = isMCPEnabled ? ["mcp", "flows"] : ["components", "flows"];
+  const getFlowTypeLabel = (type: "flows" | "components" | "mcp") => {
+    if (type === "mcp") return t("main.mcpServer");
+    if (type === "components") return t("main.components");
+    return t("main.flows");
+  };
 
   const handleDownload = () => {
     downloadFlows({ ids: selectedFlows });
-    setSuccessData({ title: "Flows downloaded successfully" });
+    setSuccessData({ title: t("main.flowsDownloadedSuccessfully") });
   };
 
   const flows = useFlowsManagerStore((state) => state.flows);
@@ -89,7 +96,7 @@ const HeaderComponent = ({
       { flow_ids: selectedFlows },
       {
         onSuccess: () => {
-          setSuccessData({ title: "Flows deleted successfully" });
+          setSuccessData({ title: t("main.flowsDeletedSuccessfully") });
           if (flows) {
             setFlows(flows.filter((flow) => !selectedFlows.includes(flow.id)));
           }
@@ -139,9 +146,7 @@ const HeaderComponent = ({
                 } text-nowrap px-2 pb-2 pt-1 text-mmd`}
               >
                 <div className={flowType === type ? "-mb-px" : ""}>
-                  {type === "mcp"
-                    ? "MCP Server"
-                    : type.charAt(0).toUpperCase() + type.slice(1)}
+                  {getFlowTypeLabel(type as "flows" | "components" | "mcp")}
                 </div>
               </Button>
             ))}
@@ -154,7 +159,9 @@ const HeaderComponent = ({
                   icon="Search"
                   data-testid="search-store-input"
                   type="text"
-                  placeholder={`Search ${flowType}...`}
+                  placeholder={t("main.searchFlowType", {
+                    flowType: getFlowTypeLabel(flowType),
+                  })}
                   className="mr-2 !text-mmd"
                   inputClassName="!text-mmd"
                   value={debouncedSearch}
@@ -213,11 +220,14 @@ const HeaderComponent = ({
                   <DeleteConfirmationModal
                     asChild
                     onConfirm={handleDelete}
-                    description={"flow" + (selectedFlows.length > 1 ? "s" : "")}
+                    description={t("main.flowCount", { count: selectedFlows.length })}
                     note={
-                      "and " +
-                      (selectedFlows.length > 1 ? "their" : "its") +
-                      " message history"
+                      t("main.deleteMessageHistoryNote", {
+                        possessive:
+                          selectedFlows.length > 1
+                            ? t("main.their")
+                            : t("main.its"),
+                      })
                     }
                   >
                     <Button
@@ -229,11 +239,11 @@ const HeaderComponent = ({
                       tabIndex={hasSelection ? 0 : -1}
                     >
                       <ForwardedIconComponent name="Trash2" />
-                      Delete
+                      {t("settings.delete")}
                     </Button>
                   </DeleteConfirmationModal>
                 </div>
-                <ShadTooltip content="New Flow" side="bottom">
+                <ShadTooltip content={t("main.newFlow")} side="bottom">
                   <Button
                     variant="default"
                     size="iconMd"
@@ -248,7 +258,7 @@ const HeaderComponent = ({
                       className="h-4 w-4"
                     />
                     <span className="hidden whitespace-nowrap font-semibold md:inline">
-                      New Flow
+                      {t("main.newFlow")}
                     </span>
                   </Button>
                 </ShadTooltip>

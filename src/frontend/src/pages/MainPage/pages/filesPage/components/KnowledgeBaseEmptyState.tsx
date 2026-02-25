@@ -1,17 +1,19 @@
 import ForwardedIconComponent from "@/components/common/genericIconComponent";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/hooks/use-i18n";
 
 const KnowledgeBaseEmptyState = ({
   handleCreateKnowledge,
 }: {
   handleCreateKnowledge: () => void;
 }) => {
+  const { t } = useI18n();
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-8 pb-8">
       <div className="flex flex-col items-center gap-2">
-        <h3 className="text-2xl font-semibold">No knowledge bases</h3>
+        <h3 className="text-2xl font-semibold">{t("knowledgeBase.none")}</h3>
         <p className="text-lg text-secondary-foreground">
-          Start with a knowledge base flow.
+          {t("knowledgeBase.startWithFlow")}
         </p>
       </div>
       <div className="flex items-center gap-2">
@@ -25,7 +27,7 @@ const KnowledgeBaseEmptyState = ({
             className="h-4 w-4"
           />
           <span className="whitespace-nowrap font-semibold">
-            Create Knowledge Base
+            {t("knowledgeBase.createKnowledgeBase")}
           </span>
         </Button>
       </div>

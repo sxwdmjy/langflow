@@ -57,15 +57,28 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (required for npx-based MCP stdio servers)
+ARG NODEJS_DIST_BASE_URL=https://nodejs.org/dist
+ARG NODEJS_DIST_FALLBACK_URL=https://npmmirror.com/mirrors/node
 RUN ARCH=$(dpkg --print-architecture) \
     && if [ "$ARCH" = "amd64" ]; then NODE_ARCH="x64"; \
        elif [ "$ARCH" = "arm64" ]; then NODE_ARCH="arm64"; \
        else NODE_ARCH="$ARCH"; fi \
-    && NODE_VERSION=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/ \
+    && NODE_VERSION=$(curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 "${NODEJS_DIST_BASE_URL}/latest-v22.x/" \
                     | grep -oP "node-v\K[0-9]+\.[0-9]+\.[0-9]+(?=-linux-${NODE_ARCH}\.tar\.xz)" \
                     | head -1) \
-    && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" \
-    | tar -xJ -C /usr/local --strip-components=1 \
+    && if [ -z "$NODE_VERSION" ]; then \
+         NODE_VERSION=$(curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 "${NODEJS_DIST_FALLBACK_URL}/latest-v22.x/" \
+                       | grep -oP "node-v\K[0-9]+\.[0-9]+\.[0-9]+(?=-linux-${NODE_ARCH}\.tar\.xz)" \
+                       | head -1); \
+       fi \
+    && [ -n "$NODE_VERSION" ] \
+    && (curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 \
+         "${NODEJS_DIST_BASE_URL}/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -o /tmp/node.tar.xz \
+        || curl -fsSL --http1.1 --retry 6 --retry-all-errors --retry-delay 2 \
+         "${NODEJS_DIST_FALLBACK_URL}/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -o /tmp/node.tar.xz) \
+    && xz -t /tmp/node.tar.xz \
+    && tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 \
+    && rm -f /tmp/node.tar.xz \
     && npm install -g npm@latest \
     && npm cache clean --force
 
@@ -76,10 +89,12 @@ RUN useradd --uid 1000 --gid 0 --no-create-home --home-dir /app/data user
 COPY --from=builder --chown=1000:0 /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create home directory and ensure proper ownership
-# The user needs write access to /app/data (home) and /app (workdir)
-# Note: .venv is already owned by 1000:0 via COPY --chown above, so no recursive chown needed
-RUN mkdir -p /app/data && chown -R 1000:0 /app/data && chown 1000:0 /app
+# Create runtime directories and ensure proper ownership
+# /app/langflow is the default LANGFLOW_CONFIG_DIR in compose examples.
+RUN mkdir -p /app/data /app/langflow \
+    && chown -R 1000:0 /app/data /app/langflow \
+    && chmod 2775 /app/data /app/langflow \
+    && chown 1000:0 /app
 
 LABEL org.opencontainers.image.title=langflow-backend
 LABEL org.opencontainers.image.authors=['Langflow']

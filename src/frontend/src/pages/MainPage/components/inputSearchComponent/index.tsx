@@ -1,6 +1,7 @@
 import type { ChangeEvent, KeyboardEvent } from "react";
 import ForwardedIconComponent from "@/components/common/genericIconComponent";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/hooks/use-i18n";
 
 type InputSearchComponentProps = {
   loading: boolean;
@@ -19,15 +20,16 @@ const InputSearchComponent = ({
   value,
   onKeyDown,
 }: InputSearchComponentProps) => {
+  const { t } = useI18n();
   const pagePath = window.location.pathname;
 
   const getSearchPlaceholder = () => {
     if (pagePath.includes("flows")) {
-      return "Search Flows";
+      return t("main.searchFlows");
     } else if (pagePath.includes("components")) {
-      return "Search Components";
+      return t("main.searchComponents");
     } else {
-      return "Search Flows and Components";
+      return t("main.searchFlowsAndComponents");
     }
   };
 
