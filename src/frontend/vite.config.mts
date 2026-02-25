@@ -56,6 +56,9 @@ export default defineConfig(({ mode }) => {
       "import.meta.env.LANGFLOW_MCP_COMPOSER_ENABLED": JSON.stringify(
         envLangflow.LANGFLOW_MCP_COMPOSER_ENABLED ?? "true",
       ),
+      "import.meta.env.LANGFLOW_I18N_STRICT_ZH": JSON.stringify(
+        envLangflow.LANGFLOW_I18N_STRICT_ZH ?? "false",
+      ),
     },
     plugins: [react(), svgr(), tsconfigPaths()],
     server: {

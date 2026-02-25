@@ -24,6 +24,7 @@ interface ImportMetaEnv {
   readonly CI: string;
   readonly LANGFLOW_AUTO_LOGIN: string;
   readonly LANGFLOW_MCP_COMPOSER_ENABLED: string;
+  readonly LANGFLOW_I18N_STRICT_ZH: string;
 }
 
 interface ImportMeta {
