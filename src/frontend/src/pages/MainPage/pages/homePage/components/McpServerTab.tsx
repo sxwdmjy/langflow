@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ENABLE_MCP_COMPOSER } from "@/customization/feature-flags";
 import { useCustomIsLocalConnection } from "@/customization/hooks/use-custom-is-local-connection";
 import useTheme from "@/customization/hooks/use-custom-theme";
+import { useI18n } from "@/hooks/use-i18n";
 import AuthModal from "@/modals/authModal";
 
 import type { MCPTransport } from "@/controllers/API/queries/mcp/use-patch-install-mcp";
@@ -20,6 +21,7 @@ import { McpFlowsSection } from "./McpFlowsSection";
 import { McpJsonContent } from "./McpJsonContent";
 
 const McpServerTab = ({ folderName }: { folderName: string }) => {
+  const { t } = useI18n();
   const isDarkMode = useTheme().dark;
   const { folderId } = useParams();
   const myCollectionId = useFolderStore((state) => state.myCollectionId);
@@ -69,11 +71,10 @@ const McpServerTab = ({ folderName }: { folderName: string }) => {
       <div className="flex justify-between gap-4 items-start">
         <div>
           <div className="pb-2 font-medium" data-testid="mcp-server-title">
-            MCP Server
+            {t("main.mcpServer")}
           </div>
           <div className="pb-4 text-mmd text-muted-foreground">
-            Access your Project's flows as Tools within a MCP Server. Learn more
-            in our
+            {t("mcp.accessFlowsAsTools")}{" "}
             <a
               className="text-accent-pink-foreground"
               href="https://docs.langflow.org/mcp-server"
@@ -81,7 +82,7 @@ const McpServerTab = ({ folderName }: { folderName: string }) => {
               rel="noreferrer"
             >
               {" "}
-              Projects as MCP Servers guide.
+              {t("mcp.guide")}
             </a>
           </div>
         </div>
@@ -117,7 +118,11 @@ const McpServerTab = ({ folderName }: { folderName: string }) => {
                   } px-3 py-2 text-[13px]`}
                   onClick={() => setSelectedMode(item.name)}
                 >
-                  <span>{item.name}</span>
+                  <span>
+                    {item.name === "Auto install"
+                      ? t("mcp.autoInstall")
+                      : t("mcp.json")}
+                  </span>
                 </Button>
               ))}
             </div>
@@ -132,15 +137,14 @@ const McpServerTab = ({ folderName }: { folderName: string }) => {
                     className="h-4 w-4 text-accent-red-foreground"
                   />
                   <span className="font-medium text-accent-red-foreground">
-                    MCP Server Configuration Error
+                    {t("mcp.configurationError")}
                   </span>
                 </div>
                 <p className="text-mmd text-accent-red-foreground">
                   {composerUrlData?.error_message}
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Please fix the OAuth configuration in your project settings to
-                  generate the MCP server configuration.
+                  {t("mcp.configurationFixHint")}
                 </p>
               </div>
             ) : selectedMode === "JSON" ? (

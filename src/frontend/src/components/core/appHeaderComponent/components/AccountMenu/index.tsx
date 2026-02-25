@@ -9,7 +9,7 @@ import { useLogout } from "@/controllers/API/queries/auth";
 import { CustomProfileIcon } from "@/customization/components/custom-profile-icon";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
 import { useI18n } from "@/hooks/use-i18n";
-import { SUPPORTED_LOCALES, type Locale } from "@/i18n";
+import { STRICT_ZH_LOCALE, SUPPORTED_LOCALES, type Locale } from "@/i18n";
 import useAuthStore from "@/stores/authStore";
 import { useDarkStore } from "@/stores/darkStore";
 import { cn, stripReleaseStageFromVersion } from "@/utils/utils";
@@ -126,6 +126,7 @@ export const AccountMenu = () => {
             <Select
               value={locale}
               onValueChange={(value) => setLocale(value as Locale)}
+              disabled={STRICT_ZH_LOCALE}
             >
               <SelectTrigger
                 className="h-8 w-[132px] text-xs"

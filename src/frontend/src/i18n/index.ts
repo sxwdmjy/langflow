@@ -5,6 +5,9 @@ export const LOCALE_STORAGE_KEY = "lf_locale";
 export const SUPPORTED_LOCALES = ["zh-CN", "en-US"] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
+export const STRICT_ZH_LOCALE =
+  String(import.meta.env.LANGFLOW_I18N_STRICT_ZH).toLowerCase() === "true";
+
 export const DEFAULT_LOCALE: Locale = "zh-CN";
 export const SUPPORTED_LOCALE_SET = new Set<Locale>(SUPPORTED_LOCALES);
 
